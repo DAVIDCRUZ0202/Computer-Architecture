@@ -107,23 +107,49 @@ and then translate!
 # Pointer
 # The above all mean the same thing!!
 
-memory = [
-    # we can put any number we want in here
-    # and assign them to mean something
-    1, # PRINT_DAVID - Address 0
-    3, # SAVE_REG - R1, 37 # Op Code
-    1, # SAVE_REG - R1 # Operand
-    37,# SAVE_REG - 37 # Operand
-    2, # HALT
-    # we can hold any number in here but 256
-    # because 256 can't be represented in binary
-    
+# For Tonight's assignment, do this in base 2 instead of base 10
+# The above code prints all lines of a given file
+# it'll print line by line, but we still need to make sure
+# to avoid all whitespace
+# avoid all comments
+# avoid all blank lines
+# print out errors for non-commands
 
-    #....... Dynamic Ram has 8 capacitors for bytes.
-    #....... meaning that D-Ram can't store anything above 8 bits.
+memory = [0] * 256
 
+# This is a "Data Driven" program.
+# We have to pass in a file to this program in order to get output
 
-]
+import sys
+
+if len(sys.argv) !=2:
+    print("usage: comp.py filename")
+    sys.exit(1)
+
+try:
+    address = 0
+
+    with open(sys.argv[1]) as f:
+        for line in f:
+            t = line.split('#')
+            n = t[0].strip()
+
+            try:
+
+                n = int(n)
+            except ValueError:
+                print(f"Invalid Number {n}")
+                sys.exit(1)
+            if n == '':
+                continue
+
+            print(repr(n))
+            memory[address] = n
+            address += 1
+
+except FileNotFoundError:
+    print(f"File not found: {sys.argv[1]}")
+    sys.exit()
 
 register = [0] * 8 # represent r0 - r7
 
@@ -169,3 +195,11 @@ while running:
 # what those meanings are.
 
 # Interrupts are a stretch goal
+
+
+#______________________________________________________________
+# Frame the Plan from Inputs to Outputs
+# Parsing, Normalize, Sanitize
+# all mean the same thing
+# Take the data, and make it into the same format
+
