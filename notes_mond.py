@@ -35,15 +35,11 @@ abcd
 1234 = 1 * 1000 + 2 * 100 + 3 + 10 + 4 * 1
        ^          ^         ^        ^
 
-"""
 
-"""
-For Hex, our digits are represented
+For Hexadecimal, our digits are represented
 by 0-9, and then A-F
 and each place value is the next 16th power
-"""
 
-"""
 Here's a binary conversion
 
 |<----- 8's place 2^3
@@ -61,18 +57,16 @@ abcd
 binary digits == ("bit")
 
 8 bits == "byte"
+
+One byte is the most common standard unit of memory used for our CPU
+
 4 bits == "nybble"
 
-"""
-
-"""
 The number base only matters
 when you write the number down.
 Once it's inside of a machine, the
 number base doesn't matter.
-"""
 
-"""
 Default languages work in base 10 most of the time.
 
 To specify the base in code:
@@ -87,22 +81,14 @@ bases only matter when you want to print it out
 all numeric values are simply numeric values
 written in one language or another
 
-"""
-
-"""
 As the base number gets bigger, 
 the amount of digits required to represent
 a numerical value goes down.
-"""
 
-"""
 4 bits(One nybble) are(is) required to store
 one hex digit.
 
 
-"""
-
-"""
 Converting from binary to hex is very easy!
 Nybbles align the digit counting between binary and hexadecimal very well.
 When converting, just chop up a binary number into 4's
@@ -112,7 +98,7 @@ and then translate!
 # Beej's Emulator
 # Memory works like a giant array
 # Think of your RAM as a massive Array
-# In the compyter, we have a RAM which contains memory
+# In the computer, we have a RAM which contains memory
 
 
 # Index into the memory array
@@ -140,8 +126,6 @@ memory = [
 ]
 
 register = [0] * 8 # represent r0 - r7
-# the below says store the value 37 in register 2
-
 
 # "Variables" in hardware, known as "registers"
 # There are a fixed number of registers

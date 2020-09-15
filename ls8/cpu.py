@@ -7,8 +7,18 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        pass
+        self.ram = [0] * 256 # 256 bytes of memory
+        self.reg = [0] * 8 # 8 general purpose registers
+        self.pc = 0 # Program Counter
 
+    def ram_read(self,MAR): # Memory Address Register
+        return self.ram[MAR] # register used for addresses
+
+    def ram_write(self, MDR, MAR): # Memory Data Register
+        self.ram[MAR] = MDR # register used for data
+        return print(f"Writing {MDR} to {MAR} Complete")
+
+    
     def load(self):
         """Load a program into memory."""
 
@@ -19,10 +29,10 @@ class CPU:
         program = [
             # From print8.ls8
             0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
+            0b00000000, # NOP - Do nothing
+            0b00001000, # Binary for 8
             0b01000111, # PRN R0
-            0b00000000,
+            0b00000000, # NOP - Do nothing
             0b00000001, # HLT
         ]
 
@@ -62,4 +72,36 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        self.IR = self.ram[self.pc] # instruction register
+        operand_a = self.ram_read(self.pc+1)
+        operand_b = self.ram_read(self.pc+2)
+
+        if self.IR == 0b10000010:
+            reg_num = operand_a
+            reg_val = operand_b
+            self.reg[reg_num] = reg_val
+            print(self.reg[reg_num])
+            self.pc += 3
+
+
+        elif self.IR == 0b00000001:
+            self.hlt()
+
+        else:
+            self.hlt()
+
+    def hlt(self):
+        print("Program Ended")
+
+
+
+# program = [
+#             # From print8.ls8
+#          0  0b10000010, # LDI R0,8
+#          1  0b00000000, # NOP - Do nothing
+#          2  0b00001000, # Binary for 8
+#          3  0b01000111, # PRN R0
+#          4  0b00000000, # NOP - Do nothing
+#          5  0b00000001, # HLT
+#         ]
+

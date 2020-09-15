@@ -60,6 +60,55 @@ but you'll have to implement those three above instructions first!
 ## Step 0: IMPORTANT: inventory what is here!
 
 * Make a list of files here.
+* List of files
+  * ASM Directory:
+    This directory takes the source code for the LS-8 and converts it into '.ls8' files. Nothing to do in here
+  * LS8 Directory:(Lamba-School 8-bit)
+    * examples Directory:
+      This directory holds examples of different functionalities. Some are stretch and some aren't.
+    * cpu.py
+      Holds the CPU class which has main functionalities for reading and writing memory
+    * ls8.py
+      Holds our emulator program for the LS-8 Hardware. This is where math happens
+    * README.md
+      This is the file holding all steps and Inventory.
+  * FAQ.md
+    Holds commonly asked questions and answers.
+  * LS8-cheatsheet.md
+    Holds shortcuts to some commands that will work for this emulator
+  * LS8-spec.md
+    Describes and holds specifications for all of LS8 methods. Not a walkthrough.
+  * notes_mond.py
+    Holds David's class notes for monday.
+  * README.md
+    Holds a general checklist for what should be done each day.
+
+  * Things that have been implemented:
+    * CPU Class
+    * constructor method is empty but exists
+    * load method loads a program into memory
+    * alu method is used to run ALU operations
+    * trace method is used to print CPU state.
+    * run method is used to run the CPU
+
+  * Things to immplement
+    * CPU
+      * Add list properties to the CPU Constructor
+      * add ram_read and ram_write to CPU methods
+      * Implement the core of the run method
+        * It needs to read the memory address that's
+        stored in register `PC`(stored outside of the CPU), and store that result in `IR`, the _InstructionRegister_. This can just be a local variable in `run()`
+      * Implement HLT
+        * ### HLT
+        `HLT`
+        Halt the CPU (and exit the emulator).
+        Machine code:
+        ```
+        00000001 
+        01
+        ```
+
+
 * Write a short 3-10-word description of what each file does.
 * Note what has been implemented, and what hasn't.
 * Read this whole file.
