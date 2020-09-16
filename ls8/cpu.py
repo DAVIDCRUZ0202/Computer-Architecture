@@ -10,6 +10,7 @@ class CPU:
         self.ram = [0] * 256 # 256 bytes of memory
         self.reg = [0] * 8 # 8 general purpose registers
         self.pc = 0 # Program Counter
+        self.reg[-1] = 0xF4
 
     def ram_read(self,MAR): # Memory Address Register
         return self.ram[MAR] # register used for addresses
@@ -103,12 +104,16 @@ class CPU:
     def run(self):
         """Run the CPU."""
         while True:
+            #self.trace()
             self.IR = self.ram[self.pc] # instruction register
             operand_a = self.ram_read(self.pc+1)
             operand_b = self.ram_read(self.pc+2)
             # Generic Increment for instructions
             byte = self.IR
-            pc_instructions = byte >> 6      
+            pc_instructions = byte >> 6
+            SP = 7 # This is the stack pointer
+           
+
             if self.IR == 0b10000010:
                 reg_num = operand_a
                 reg_val = operand_b
@@ -126,6 +131,36 @@ class CPU:
 
             elif self.IR == 0b00000001:
                 self.hlt()
+
+            elif self.IR == 0b01000101: # Push
+                # Decrement SP
+                self.reg[SP] -= 1
+
+                # Get the reg number to push to
+                reg_num = operand_a
+
+                # Get the value to push to the registry number
+                value = self.reg[reg_num]
+
+                # copy the value to the Stack Pointer's Address
+                top_of_stack = self.reg[SP]
+                self.ram[top_of_stack] = value
+
+            elif self.IR == 0b01000110: # Pop
+                # Get the register to Pop the value to
+                reg_num = operand_a
+
+                # Get the top of the stack 
+                top_of_stack = self.reg[SP]
+            
+                # Get the value of the top of the stack
+                value = self.ram[top_of_stack]
+
+                # Store the value in the register
+                self.reg[reg_num] = value
+
+                # Increment the SP
+                self.reg[SP] += 1
 
             else:
                 self.hlt()
