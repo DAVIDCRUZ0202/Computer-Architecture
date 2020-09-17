@@ -1,0 +1,13 @@
+SAVE_REG R0, 37
+PRINT_REG R0
+
+SAVE_REG R1, (address of subroutine)
+CALL R1
+
+HALT
+
+# Subroutine:
+PRINT_DAVID
+PRINT_DAVID
+PRINT_DAVID
+RET

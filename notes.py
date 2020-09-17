@@ -166,6 +166,30 @@ pc = 0# Program Counter, address of the currently-executing instruction
 SP = 7
 register[SP] = 0xF4
 
+def push_value(value):
+        # Decrement SP
+    register[SP] -= 1
+
+    # copy the value to the SP address
+    top_of_stack_addr = register[SP]
+    memory[top_of_stack_addr] = value
+
+
+def pop_value():
+    
+        # Get the top of stack addr
+        top_of_stack_addr = register[SP]
+
+        # Get the value of the top of stack
+        value = memory[top_of_stack_addr]
+
+        # Increment SP
+        register[SP] += 1
+
+        return value
+
+
+
 running = True
 
 while running:
@@ -191,20 +215,15 @@ while running:
         pc += 2
 
     elif ir == 5: # PUSH
-        # Decrement SP
-        register[SP] -= 1
-
         # Get the reg num to push
         reg_num = memory[pc + 1]
 
         # Get the value to push
         value = register[reg_num]
 
-        # copy the value to the SP address
-        top_of_stack_addr = register[SP]
-        memory[top_of_stack_addr] = value
+        push_value(value)
 
-        print(memory[0xea:0xf4])
+        # print(memory[0xea:0xf4])
 
         pc += 2
 
@@ -212,11 +231,7 @@ while running:
         # Get the reg to pop into
         reg_num = memory[pc + 1]
 
-        # Get the top of stack addr
-        top_of_stack_addr = register[SP]
-
-        # Get the value of the top of stack
-        value = memory[top_of_stack_addr]
+        value = pop_value()
 
         #Store the value in the register
         register[reg_num] = value
@@ -228,10 +243,36 @@ while running:
 
         print(memory[0xea:0xf4])
 
+    elif ir == CALL:
+
+        # Compute the return addr
+        return_addr = pc + 2
+
+        # Push the return addr on stack
+        push_value(return_addr)
+
+        # get the value from the operand reg
+        reg_num = memory[pc + 1]
+        value = register[reg_num]
+
+        # set the pc to that value
+        pc = value
+
     else:
         print(f"Unknown Instruction {ir}")
 
 
+# For moving the PC, use an if else statement which checks
+# the fourth bit of the instruction. if that fourth bit is
+# true, then the instruction sets the value and we can continue.
+# if that fourth bit is false, then set the pc to the new value.
+
+
+
+# inst_sets_pc = (ir >> 4) & 1 == 1:
+
+
+# if not inst_sets_pc:
 
 #_________________________________________________
 #  Instruction     location
@@ -370,3 +411,94 @@ while running:
 # place the value at the given register
 # Stack pointer points at the item most recently pushed
 #
+
+
+#____________________________________________________________________________
+####################    Subroutines    #############################
+
+# Think of subroutines in a CPU as functions in higher-level languages
+
+# In assembly, we "CALL" a subroutine at a particular address.
+
+# Then we "RET"(return) from that subroutine to pick up where we left off, just like a function
+# does in a higher level language.
+
+#######   Limitations with assembly-level subroutines
+# CPU's are pretty simple machines.
+# No arguments. Only takes one operand
+# No return values. 
+# These can be implemented in a variety of ways (as you'll learn)
+
+###### Use the stack!!!
+
+# When we call a subroutine, we need to store the return address somewhere so we
+# know where to go when we hit the "RET" instruction.
+
+# CPU's use a stack for this.
+
+# Call will push the address of the instruction after it onto the stack, then move 
+# the PC to the subroutine address
+
+# RET will ppo the return address off of the stack, and store it in the PC.
+
+# Use any place you'd use functions in a higher-level language
+
+## DRY principle
+
+# High-level languages eventually use CALL and RET deep down to implement functions.
+
+# The stack is used to store the return address so that we can remember to advance 
+# through our PC instead of entering an infinite loop
+
+# Since stacks are first in first out, we can create local variables by pushing 
+# more values onto the stack for local variable use, and popping them off one by one
+# until we are left with the final stack pop to return our subroutine
+
+# arguments could be passed to subroutines by adding them as instructions
+
+#_____________________________________________________________
+# beej's notes
+# Subroutines are functions
+# but you can't pass anything in
+# and they cant return anything
+
+
+#----------------------------
+# def foo():
+#     print("foo 1")
+
+#     return
+
+# def bar():
+#     print("bar 1")
+#     foo()
+#     print("bar 2")
+
+#     return
+
+# print("main 1")
+# bar()
+# print("main 2")
+#_______________________________
+
+# The above is a good example of how a CPU keeps track of where they are
+# in a calling process. They assign addresses to different commands.
+
+
+#CALL:
+    # push return address on stack. This is the instruction which follows the Call instruction
+    # set pc to address of subroutine
+
+# RET:
+    # pop the return address value from the stack
+    # assign the pc to that value
+
+# When you call:
+    # Allocate a stack frame
+        # stack frame is the return address and the locals
+
+
+# When you return:
+    # Deallocate (pop) that stack frame
+    # set the pc to the return address
+

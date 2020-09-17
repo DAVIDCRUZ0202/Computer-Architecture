@@ -11,6 +11,7 @@ class CPU:
         self.reg = [0] * 8 # 8 general purpose registers
         self.pc = 0 # Program Counter
         self.reg[-1] = 0xF4
+        self.SP = 7
 
     def ram_read(self,MAR): # Memory Address Register
         return self.ram[MAR] # register used for addresses
@@ -19,6 +20,25 @@ class CPU:
         self.ram[MAR] = MDR # register used for data
         return print(f"Writing {MDR} to {MAR} Complete")
 
+    def push_value(self, value):
+        # decrement the stack pointer
+        self.reg[self.SP] -= 1
+
+        # copy the value to the SP address
+        top_of_stack_address = self.reg[self.SP]
+        self.ram[top_of_stack_address] = value
+
+    def pop_value(self):
+        # Get the top of stack addr
+        top_of_stack_address = self.reg[self.SP]
+
+        # Get the value of the top of the stack
+        value = self.ram[top_of_stack_address]
+
+        #Increment the stack pointer
+        self.reg[self.SP] += 1
+
+        return value
     
     def load(self):
         """Load a program into memory."""
@@ -111,7 +131,6 @@ class CPU:
             # Generic Increment for instructions
             byte = self.IR
             pc_instructions = byte >> 6
-            SP = 7 # This is the stack pointer
            
 
             if self.IR == 0b10000010:
@@ -123,7 +142,12 @@ class CPU:
                 reg_num = operand_a
                 print(self.reg[reg_num])
 
-            elif self.IR == 0b10100010:
+            elif self.IR == 0b10100000: # Add
+                reg_num1 = operand_a
+                reg_num2 = operand_b
+                self.alu("ADD", reg_num1, reg_num2)
+
+            elif self.IR == 0b10100010: # Multiply
                 reg_num1 = operand_a
                 reg_num2 = operand_b
                 self.alu("MUL", reg_num1, reg_num2)
@@ -133,8 +157,6 @@ class CPU:
                 self.hlt()
 
             elif self.IR == 0b01000101: # Push
-                # Decrement SP
-                self.reg[SP] -= 1
 
                 # Get the reg number to push to
                 reg_num = operand_a
@@ -142,30 +164,45 @@ class CPU:
                 # Get the value to push to the registry number
                 value = self.reg[reg_num]
 
-                # copy the value to the Stack Pointer's Address
-                top_of_stack = self.reg[SP]
-                self.ram[top_of_stack] = value
+                # use the helper to push the value
+                self.push_value(value)
+
+
 
             elif self.IR == 0b01000110: # Pop
                 # Get the register to Pop the value to
                 reg_num = operand_a
 
-                # Get the top of the stack 
-                top_of_stack = self.reg[SP]
-            
                 # Get the value of the top of the stack
-                value = self.ram[top_of_stack]
+                value = self.pop_value()
 
                 # Store the value in the register
                 self.reg[reg_num] = value
 
-                # Increment the SP
-                self.reg[SP] += 1
+            elif self.IR == 0b01010000: # Call
+                # Push return addr on stack
+                self.push_value(self.pc+2)
+                # Get the value from the operand reg
+                reg_num = self.ram[operand_a]
+                value = self.reg[reg_num]
+                # Set the pc to that value
+                self.pc = value
+                continue
+
+            elif self.IR == 0b00010001: # Return
+                # pop the return address from the stack
+                return_address = self.pop_value()
+                # assign the pc to that value
+                self.pc = return_address
 
             else:
+                print(f"Unknown Instruction {bin(self.IR)}")
                 self.hlt()
 
-            self.pc += pc_instructions + 1
+            instructions_set_pc = (self.IR >> 4) & 1 == 1
+            
+            if not instructions_set_pc:
+                self.pc += pc_instructions + 1
 
     def hlt(self):
         print("Program Ended")
